@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 22, 24, 35;
+  --background-end-rgb: 12, 12, 79;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(135deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 100%);
+  min-height: 100vh;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #FE2C55, #25F4EE, #5C50FF);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.card {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-xl;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-tiktok-red to-starknet-purple text-white font-semibold py-3 px-6 rounded-xl 
+         hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 
+         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+}
+
+.btn-secondary {
+  @apply bg-white/10 border border-white/30 text-white font-semibold py-3 px-6 rounded-xl 
+         hover:bg-white/20 transition-all duration-200;
+}
+
+.input {
+  @apply w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white 
+         placeholder:text-white/50 focus:outline-none focus:border-tiktok-cyan focus:ring-1 focus:ring-tiktok-cyan
+         transition-all duration-200;
+}
+
+.input-admin {
+  @apply w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white 
+         placeholder:text-gray-400 focus:outline-none focus:border-starknet-purple focus:ring-1 focus:ring-starknet-purple;
+}
