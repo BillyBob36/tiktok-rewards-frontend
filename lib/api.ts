@@ -32,6 +32,9 @@ export const adminCreateCampaign = (password: string, data: any) =>
 export const adminUpdateCampaign = (password: string, id: number, data: any) => 
   api.put(`/campaigns/${id}`, data, adminHeaders(password));
 
+export const adminDeleteCampaign = (password: string, id: number) => 
+  api.delete(`/campaigns/${id}`, adminHeaders(password));
+
 export const adminGetSubmissions = (password: string, params?: { campaign_id?: number; status?: string }) =>
   api.get('/submissions', { ...adminHeaders(password), params });
 

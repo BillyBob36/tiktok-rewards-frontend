@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import {
-  adminGetCampaigns, adminCreateCampaign, adminUpdateCampaign,
+  adminGetCampaigns, adminCreateCampaign, adminUpdateCampaign, adminDeleteCampaign,
   adminGetSubmissions, adminGetStats, adminBatchUpdateStatus,
   adminGetBalance, adminSimulatePayout, adminExecutePayout
 } from '@/lib/api';
@@ -240,6 +240,35 @@ export default function AdminPage() {
       max_winners: campaign.max_winners
     });
     setShowCampaignForm(true);
+  };
+
+  const handleToggleCampaign = async (campaign: Campaign) => {
+    setLoading(true);
+    try {
+      await adminUpdateCampaign(password, campaign.id, { is_active: campaign.is_active ? 0 : 1 });
+      loadData();
+    } catch (err) {
+      console.error('Failed to toggle campaign');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCampaign = async (campaign: Campaign) => {
+    if (!confirm(`Supprimer la campagne "${campaign.name}" ? Cette action est irréversible.`)) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await adminDeleteCampaign(password, campaign.id);
+      setShowCampaignForm(false);
+      setEditingCampaign(null);
+      loadData();
+    } catch (err) {
+      console.error('Failed to delete campaign');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -612,6 +641,28 @@ export default function AdminPage() {
                         />
                       </div>
                     </div>
+                    {editingCampaign && (
+                      <div className="flex gap-3 pt-4 border-t border-gray-700">
+                        <button
+                          onClick={() => handleToggleCampaign(editingCampaign)}
+                          disabled={loading}
+                          className={`flex-1 py-2 rounded-lg transition-colors ${
+                            editingCampaign.is_active 
+                              ? 'bg-yellow-600 hover:bg-yellow-500' 
+                              : 'bg-green-600 hover:bg-green-500'
+                          }`}
+                        >
+                          {editingCampaign.is_active ? 'Suspendre' : 'Activer'}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCampaign(editingCampaign)}
+                          disabled={loading}
+                          className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded-lg transition-colors"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    )}
                     <div className="flex gap-3 pt-4">
                       <button
                         onClick={() => setShowCampaignForm(false)}
