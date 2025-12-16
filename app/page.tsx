@@ -149,10 +149,10 @@ export default function HomePage() {
             <Image src="/logo-starktok.png" alt="StarkTok" width={80} height={80} />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">TikTok Rewards</span>
+            <span className="gradient-text">StarkTok Rewards</span>
           </h1>
           <p className="text-white/70 text-lg">
-            Soumets ta vidéo TikTok et gagne des STRK
+            Tcheck ton TikTok et chopes tes Stark !
           </p>
         </header>
 
