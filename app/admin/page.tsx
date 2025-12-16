@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Settings, Users, Eye, Heart, MessageCircle, Share2, 
+  Users, Eye, Heart, MessageCircle, Share2, 
   Wallet, CheckCircle, XCircle, Loader2, ExternalLink, 
-  RefreshCw, DollarSign, AlertTriangle, LogIn, ArrowLeft
+  RefreshCw, DollarSign, AlertTriangle, LogIn, ArrowLeft, Settings
 } from 'lucide-react';
+import Image from 'next/image';
 import {
   adminGetCampaigns, adminCreateCampaign, adminUpdateCampaign,
   adminGetSubmissions, adminGetStats, adminBatchUpdateStatus,
@@ -258,7 +259,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-2xl p-8 max-w-md w-full">
           <div className="text-center mb-6">
-            <Settings className="w-12 h-12 mx-auto mb-4 text-starknet-purple" />
+            <Image src="/logo-starktok.png" alt="StarkTok" width={48} height={48} className="mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
             <p className="text-gray-400">TikTok Rewards Campaign</p>
           </div>
@@ -299,7 +300,7 @@ export default function AdminPage() {
       <header className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Settings className="w-8 h-8 text-starknet-purple" />
+            <Image src="/logo-starktok.png" alt="StarkTok" width={32} height={32} />
             <div>
               <h1 className="text-xl font-bold">Admin Panel</h1>
               <p className="text-sm text-gray-400">TikTok Rewards</p>

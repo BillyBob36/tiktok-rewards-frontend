@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Music, Wallet, Gift, CheckCircle, XCircle, Loader2, ExternalLink, LogOut } from 'lucide-react';
+import { Gift, CheckCircle, XCircle, Loader2, ExternalLink, LogOut } from 'lucide-react';
+import Image from 'next/image';
 import { getTikTokAuthUrl, tiktokCallback, getSession, getActiveCampaign, submitVideo, logout } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
 
@@ -144,10 +145,8 @@ export default function HomePage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <header className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Music className="w-10 h-10 text-tiktok-red" />
-            <span className="text-3xl font-bold">×</span>
-            <Wallet className="w-10 h-10 text-starknet-purple" />
+          <div className="flex items-center justify-center mb-4">
+            <Image src="/logo-starktok.png" alt="StarkTok" width={80} height={80} />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="gradient-text">TikTok Rewards</span>
@@ -190,7 +189,7 @@ export default function HomePage() {
           {!user ? (
             // Login Section
             <div className="text-center py-8">
-              <Music className="w-16 h-16 mx-auto mb-4 text-tiktok-red" />
+              <Image src="/logo-starktok.png" alt="StarkTok" width={64} height={64} className="mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-2">Connecte-toi avec TikTok</h2>
               <p className="text-white/60 mb-6">
                 Pour participer, connecte ton compte TikTok
@@ -203,7 +202,7 @@ export default function HomePage() {
                 {authLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <Music className="w-5 h-5" />
+                  <Image src="/logo-starktok.png" alt="StarkTok" width={20} height={20} />
                 )}
                 Se connecter avec TikTok
               </button>
