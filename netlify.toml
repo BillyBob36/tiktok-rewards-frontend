@@ -6,4 +6,4 @@
   package = "@netlify/plugin-nextjs"
 
 [build.environment]
-  NEXT_PUBLIC_API_URL = "https://tiktok-rewards-backend.onrender.com"
+  NEXT_PUBLIC_API_URL = "https://tiktok-rewards-backend-11x9.onrender.com"
