@@ -12,6 +12,8 @@ export const getTikTokAuthUrl = () => api.get('/auth/tiktok/url');
 export const tiktokCallback = (code: string) => api.post('/auth/tiktok/callback', { code });
 export const getSession = (sessionId: string) => api.get(`/auth/session/${sessionId}`);
 export const logout = (sessionId: string) => api.delete(`/auth/session/${sessionId}`);
+export const getUserVideos = (sessionId: string, cursor?: string) => 
+  api.get(`/auth/videos/${sessionId}`, { params: cursor ? { cursor } : {} });
 
 // Campaigns (public)
 export const getActiveCampaign = () => api.get('/campaigns/active');

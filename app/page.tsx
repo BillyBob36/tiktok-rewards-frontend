@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Gift, CheckCircle, XCircle, Loader2, ExternalLink, LogOut } from 'lucide-react';
+import { Gift, CheckCircle, XCircle, Loader2, ExternalLink, LogOut, Search, Eye, Heart, MessageCircle, Share2, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
-import { getTikTokAuthUrl, tiktokCallback, getSession, getActiveCampaign, submitVideo, logout } from '@/lib/api';
+import { getTikTokAuthUrl, tiktokCallback, getSession, getActiveCampaign, submitVideo, logout, getUserVideos } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
 
 interface Campaign {
@@ -23,6 +23,20 @@ interface User {
   avatar?: string;
 }
 
+interface Video {
+  id: string;
+  title: string;
+  description: string;
+  coverUrl: string;
+  shareUrl: string;
+  stats: {
+    views: number;
+    likes: number;
+    comments: number;
+    shares: number;
+  };
+}
+
 interface SubmissionResult {
   eligible: boolean;
   message: string;
@@ -33,7 +47,11 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
-  const [videoUrl, setVideoUrl] = useState('');
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [videoSearch, setVideoSearch] = useState('');
+  const [videosLoading, setVideosLoading] = useState(false);
+  const [showVideoList, setShowVideoList] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
@@ -112,12 +130,44 @@ export default function HomePage() {
     localStorage.removeItem('sessionId');
     setSessionId(null);
     setUser(null);
+    setVideos([]);
+    setSelectedVideo(null);
     setResult(null);
+  };
+
+  const loadVideos = async () => {
+    if (!sessionId) return;
+    setVideosLoading(true);
+    try {
+      const response = await getUserVideos(sessionId);
+      setVideos(response.data.videos || []);
+    } catch (err) {
+      console.error('Failed to load videos');
+    } finally {
+      setVideosLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (sessionId && user) {
+      loadVideos();
+    }
+  }, [sessionId, user]);
+
+  const filteredVideos = videos.filter(v => 
+    v.title.toLowerCase().includes(videoSearch.toLowerCase()) ||
+    v.description.toLowerCase().includes(videoSearch.toLowerCase())
+  );
+
+  const handleSelectVideo = (video: Video) => {
+    setSelectedVideo(video);
+    setShowVideoList(false);
+    setVideoSearch('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!sessionId || !videoUrl || !walletAddress) return;
+    if (!sessionId || !selectedVideo || !walletAddress) return;
 
     setLoading(true);
     setError(null);
@@ -126,12 +176,12 @@ export default function HomePage() {
     try {
       const response = await submitVideo({
         sessionId,
-        videoUrl,
+        videoUrl: selectedVideo.shareUrl,
         walletAddress
       });
       setResult(response.data);
       if (response.data.eligible) {
-        setVideoUrl('');
+        setSelectedVideo(null);
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Submission failed');
@@ -229,21 +279,101 @@ export default function HomePage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Video Selector */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Lien de ta vidéo TikTok
+                    Sélectionne ta vidéo TikTok
                   </label>
-                  <input
-                    type="url"
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    placeholder="https://www.tiktok.com/@username/video/..."
-                    className="input"
-                    required
-                  />
-                  <p className="text-xs text-white/50 mt-1">
-                    Colle le lien complet de ta vidéo TikTok
-                  </p>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowVideoList(!showVideoList)}
+                      className="input w-full text-left flex items-center justify-between"
+                    >
+                      {selectedVideo ? (
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          {selectedVideo.coverUrl && (
+                            <img src={selectedVideo.coverUrl} alt="" className="w-10 h-10 rounded object-cover" />
+                          )}
+                          <span className="truncate">{selectedVideo.title}</span>
+                        </div>
+                      ) : (
+                        <span className="text-white/50">Choisis une vidéo...</span>
+                      )}
+                      <ChevronDown className={`w-5 h-5 transition-transform ${showVideoList ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {showVideoList && (
+                      <div className="absolute z-10 mt-2 w-full bg-gray-800 border border-white/10 rounded-xl shadow-xl max-h-80 overflow-hidden">
+                        {/* Search */}
+                        <div className="p-3 border-b border-white/10">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                            <input
+                              type="text"
+                              value={videoSearch}
+                              onChange={(e) => setVideoSearch(e.target.value)}
+                              placeholder="Rechercher..."
+                              className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-tiktok-cyan"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Video List */}
+                        <div className="overflow-y-auto max-h-56">
+                          {videosLoading ? (
+                            <div className="p-4 text-center">
+                              <Loader2 className="w-6 h-6 animate-spin mx-auto text-tiktok-cyan" />
+                            </div>
+                          ) : filteredVideos.length === 0 ? (
+                            <div className="p-4 text-center text-white/50 text-sm">
+                              {videos.length === 0 ? 'Aucune vidéo trouvée' : 'Aucun résultat'}
+                            </div>
+                          ) : (
+                            filteredVideos.map((video) => (
+                              <button
+                                key={video.id}
+                                type="button"
+                                onClick={() => handleSelectVideo(video)}
+                                className="w-full p-3 hover:bg-white/5 flex items-start gap-3 text-left transition-colors"
+                              >
+                                {video.coverUrl && (
+                                  <img src={video.coverUrl} alt="" className="w-12 h-16 rounded object-cover flex-shrink-0" />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium truncate">{video.title}</div>
+                                  <div className="flex items-center gap-3 text-xs text-white/50 mt-1">
+                                    <span className="flex items-center gap-1">
+                                      <Eye className="w-3 h-3" /> {formatNumber(video.stats.views)}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <Heart className="w-3 h-3" /> {formatNumber(video.stats.likes)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedVideo && (
+                    <div className="mt-2 p-3 bg-white/5 rounded-lg">
+                      <div className="flex items-center gap-4 text-sm text-white/70">
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-4 h-4" /> {formatNumber(selectedVideo.stats.views)} vues
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-4 h-4" /> {formatNumber(selectedVideo.stats.likes)} likes
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageCircle className="w-4 h-4" /> {formatNumber(selectedVideo.stats.comments)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -260,13 +390,13 @@ export default function HomePage() {
                     required
                   />
                   <p className="text-xs text-white/50 mt-1">
-                    L'adresse où tu recevras tes STRK (Argent, Braavos...)
+                    L'adresse où tu recevras tes STRK (Argent X, Braavos...)
                   </p>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading || !videoUrl || !walletAddress}
+                  disabled={loading || !selectedVideo || !walletAddress}
                   className="btn-primary w-full flex items-center justify-center gap-2"
                 >
                   {loading ? (
