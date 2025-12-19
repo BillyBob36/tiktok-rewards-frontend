@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { 
   Users, Eye, Heart, MessageCircle, Share2, 
   Wallet, CheckCircle, XCircle, Loader2, ExternalLink, 
-  RefreshCw, DollarSign, AlertTriangle, LogIn, ArrowLeft, Settings
+  RefreshCw, DollarSign, AlertTriangle, LogIn, LogOut, ArrowLeft, Settings
 } from 'lucide-react';
 import Image from 'next/image';
 import {
@@ -347,8 +347,20 @@ export default function AdminPage() {
               onClick={loadData}
               disabled={loading}
               className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              title="Refresh"
             >
               <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem('adminPassword');
+                setIsAuthenticated(false);
+                setPassword('');
+              }}
+              className="p-2 hover:bg-red-600 rounded-lg transition-colors text-red-400 hover:text-white"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
             </button>
           </div>
         </div>
