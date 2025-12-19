@@ -17,9 +17,10 @@ export const getUserVideos = (sessionId: string, cursor?: string) =>
 
 // Campaigns (public)
 export const getActiveCampaign = () => api.get('/campaigns/active');
+export const getAllActiveCampaigns = () => api.get('/campaigns/active/all');
 
 // Submissions (user)
-export const submitVideo = (data: { sessionId: string; videoUrl: string; walletAddress: string }) =>
+export const submitVideo = (data: { sessionId: string; videoUrl: string; walletAddress: string; campaignId?: number }) =>
   api.post('/submissions', data);
 
 // Admin endpoints
