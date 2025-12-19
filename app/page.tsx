@@ -202,7 +202,7 @@ export default function HomePage() {
             <span className="gradient-text">StarkTok Rewards</span>
           </h1>
           <p className="text-white/70 text-lg">
-            Tcheck ton TikTok et chopes tes Stark !
+            Check your TikTok and grab your Stark!
           </p>
         </header>
 
@@ -216,19 +216,19 @@ export default function HomePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-2xl font-bold text-tiktok-cyan">{formatNumber(campaign.min_views)}</div>
-                <div className="text-sm text-white/60">Vues min.</div>
+                <div className="text-sm text-white/60">Min. Views</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-2xl font-bold text-tiktok-red">{formatNumber(campaign.min_likes)}</div>
-                <div className="text-sm text-white/60">Likes min.</div>
+                <div className="text-sm text-white/60">Min. Likes</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-2xl font-bold text-starknet-purple">{campaign.reward_amount}</div>
-                <div className="text-sm text-white/60">STRK à gagner</div>
+                <div className="text-sm text-white/60">STRK to Win</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-2xl font-bold text-white">{campaign.max_winners}</div>
-                <div className="text-sm text-white/60">Gagnants max</div>
+                <div className="text-sm text-white/60">Max Winners</div>
               </div>
             </div>
           </div>
@@ -240,9 +240,9 @@ export default function HomePage() {
             // Login Section
             <div className="text-center py-8">
               <Image src="/logo-starktok.png" alt="StarkTok" width={64} height={64} className="mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Connecte-toi avec TikTok</h2>
+              <h2 className="text-2xl font-bold mb-2">Connect with TikTok</h2>
               <p className="text-white/60 mb-6">
-                Pour participer, connecte ton compte TikTok
+                To participate, connect your TikTok account
               </p>
               <button
                 onClick={handleTikTokLogin}
@@ -254,7 +254,7 @@ export default function HomePage() {
                 ) : (
                   <Image src="/logo-starktok.png" alt="StarkTok" width={20} height={20} />
                 )}
-                Se connecter avec TikTok
+                Login with TikTok
               </button>
             </div>
           ) : (
@@ -267,7 +267,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="font-semibold">{user.username}</div>
-                    <div className="text-sm text-white/60">Connecté via TikTok</div>
+                    <div className="text-sm text-white/60">Connected via TikTok</div>
                   </div>
                 </div>
                 <button
@@ -282,7 +282,7 @@ export default function HomePage() {
                 {/* Video Selector */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Sélectionne ta vidéo TikTok
+                    Select your TikTok video
                   </label>
                   <div className="relative">
                     <button
@@ -298,7 +298,7 @@ export default function HomePage() {
                           <span className="truncate">{selectedVideo.title}</span>
                         </div>
                       ) : (
-                        <span className="text-white/50">Choisis une vidéo...</span>
+                        <span className="text-white/50">Choose a video...</span>
                       )}
                       <ChevronDown className={`w-5 h-5 transition-transform ${showVideoList ? 'rotate-180' : ''}`} />
                     </button>
@@ -313,7 +313,7 @@ export default function HomePage() {
                               type="text"
                               value={videoSearch}
                               onChange={(e) => setVideoSearch(e.target.value)}
-                              placeholder="Rechercher..."
+                              placeholder="Search..."
                               className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-tiktok-cyan"
                             />
                           </div>
@@ -327,7 +327,7 @@ export default function HomePage() {
                             </div>
                           ) : filteredVideos.length === 0 ? (
                             <div className="p-4 text-center text-white/50 text-sm">
-                              {videos.length === 0 ? 'Aucune vidéo trouvée' : 'Aucun résultat'}
+                              {videos.length === 0 ? 'No videos found' : 'No results'}
                             </div>
                           ) : (
                             filteredVideos.map((video) => (
@@ -363,7 +363,7 @@ export default function HomePage() {
                     <div className="mt-2 p-3 bg-white/5 rounded-lg">
                       <div className="flex items-center gap-4 text-sm text-white/70">
                         <span className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" /> {formatNumber(selectedVideo.stats.views)} vues
+                          <Eye className="w-4 h-4" /> {formatNumber(selectedVideo.stats.views)} views
                         </span>
                         <span className="flex items-center gap-1">
                           <Heart className="w-4 h-4" /> {formatNumber(selectedVideo.stats.likes)} likes
@@ -378,7 +378,7 @@ export default function HomePage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Ton adresse wallet Starknet
+                    Your Starknet wallet address
                   </label>
                   <input
                     type="text"
@@ -390,7 +390,7 @@ export default function HomePage() {
                     required
                   />
                   <p className="text-xs text-white/50 mt-1">
-                    L'adresse où tu recevras tes STRK (Argent X, Braavos...)
+                    The address where you'll receive your STRK (Argent X, Braavos...)
                   </p>
                 </div>
 
@@ -404,7 +404,7 @@ export default function HomePage() {
                   ) : (
                     <Gift className="w-5 h-5" />
                   )}
-                  Soumettre ma vidéo
+                  Submit my video
                 </button>
               </form>
             </div>

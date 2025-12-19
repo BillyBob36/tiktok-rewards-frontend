@@ -90,7 +90,7 @@ export default function AdminPage() {
       localStorage.setItem('adminPassword', password);
       loadData();
     } catch (err) {
-      setAuthError('Mot de passe incorrect');
+      setAuthError('Incorrect password');
     }
   };
 
@@ -180,11 +180,11 @@ export default function AdminPage() {
     });
 
     if (eligibleIds.length === 0) {
-      alert('Sélectionnez des soumissions éligibles pour le paiement');
+      alert('Select eligible submissions for payment');
       return;
     }
 
-    if (!confirm(`Confirmer le paiement pour ${eligibleIds.length} gagnant(s) ?`)) {
+    if (!confirm(`Confirm payment for ${eligibleIds.length} winner(s)?`)) {
       return;
     }
 
@@ -195,7 +195,7 @@ export default function AdminPage() {
       setSelectedIds([]);
       loadData();
     } catch (err: any) {
-      alert('Erreur: ' + (err.response?.data?.error || err.message));
+      alert('Error: ' + (err.response?.data?.error || err.message));
     } finally {
       setPayoutLoading(false);
     }
@@ -255,7 +255,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteCampaign = async (campaign: Campaign) => {
-    if (!confirm(`Supprimer la campagne "${campaign.name}" ? Cette action est irréversible.`)) {
+    if (!confirm(`Delete campaign "${campaign.name}"? This action is irreversible.`)) {
       return;
     }
     setLoading(true);
@@ -263,9 +263,10 @@ export default function AdminPage() {
       await adminDeleteCampaign(password, campaign.id);
       setShowCampaignForm(false);
       setEditingCampaign(null);
-      loadData();
+      await loadDataWithPassword(password);
     } catch (err) {
-      console.error('Failed to delete campaign');
+      console.error('Failed to delete campaign', err);
+      alert('Failed to delete campaign');
     } finally {
       setLoading(false);
     }
@@ -299,7 +300,7 @@ export default function AdminPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              placeholder="Mot de passe admin"
+              placeholder="Admin password"
               className="input-admin w-full"
             />
             {authError && (
@@ -310,13 +311,13 @@ export default function AdminPage() {
               className="w-full bg-starknet-purple hover:bg-starknet-purple/80 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               <LogIn className="w-5 h-5" />
-              Se connecter
+              Login
             </button>
           </div>
           
           <a href="/" className="flex items-center justify-center gap-2 mt-6 text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Retour à l'accueil
+            Back to home
           </a>
         </div>
       </div>
@@ -363,23 +364,23 @@ export default function AdminPage() {
             </div>
             <div className="bg-yellow-500/10 rounded-xl p-4">
               <div className="text-3xl font-bold text-yellow-400">{stats.pending}</div>
-              <div className="text-sm text-gray-400">En attente</div>
+              <div className="text-sm text-gray-400">Pending</div>
             </div>
             <div className="bg-blue-500/10 rounded-xl p-4">
               <div className="text-3xl font-bold text-blue-400">{stats.eligible}</div>
-              <div className="text-sm text-gray-400">Éligibles</div>
+              <div className="text-sm text-gray-400">Eligible</div>
             </div>
             <div className="bg-purple-500/10 rounded-xl p-4">
               <div className="text-3xl font-bold text-purple-400">{stats.winners}</div>
-              <div className="text-sm text-gray-400">Gagnants</div>
+              <div className="text-sm text-gray-400">Winners</div>
             </div>
             <div className="bg-green-500/10 rounded-xl p-4">
               <div className="text-3xl font-bold text-green-400">{stats.paid}</div>
-              <div className="text-sm text-gray-400">Payés</div>
+              <div className="text-sm text-gray-400">Paid</div>
             </div>
             <div className="bg-red-500/10 rounded-xl p-4">
               <div className="text-3xl font-bold text-red-400">{stats.rejected}</div>
-              <div className="text-sm text-gray-400">Rejetés</div>
+              <div className="text-sm text-gray-400">Rejected</div>
             </div>
           </div>
         </div>
@@ -397,7 +398,7 @@ export default function AdminPage() {
             }`}
           >
             <Users className="w-4 h-4 inline mr-2" />
-            Soumissions
+            Submissions
           </button>
           <button
             onClick={() => setActiveTab('campaigns')}
@@ -408,7 +409,7 @@ export default function AdminPage() {
             }`}
           >
             <Settings className="w-4 h-4 inline mr-2" />
-            Campagnes
+            Campaigns
           </button>
         </div>
       </div>
@@ -424,28 +425,28 @@ export default function AdminPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="input-admin"
               >
-                <option value="">Tous les statuts</option>
-                <option value="pending">En attente</option>
-                <option value="eligible">Éligibles</option>
-                <option value="winner">Gagnants</option>
-                <option value="paid">Payés</option>
-                <option value="rejected">Rejetés</option>
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="eligible">Eligible</option>
+                <option value="winner">Winners</option>
+                <option value="paid">Paid</option>
+                <option value="rejected">Rejected</option>
               </select>
 
               {selectedIds.length > 0 && (
                 <>
-                  <span className="text-gray-400">{selectedIds.length} sélectionné(s)</span>
+                  <span className="text-gray-400">{selectedIds.length} selected</span>
                   <button
                     onClick={() => handleBatchStatus('winner')}
                     className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors"
                   >
-                    Marquer gagnants
+                    Mark as winners
                   </button>
                   <button
                     onClick={() => handleBatchStatus('rejected')}
                     className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors"
                   >
-                    Rejeter
+                    Reject
                   </button>
                   <button
                     onClick={handlePayout}
@@ -457,7 +458,7 @@ export default function AdminPage() {
                     ) : (
                       <DollarSign className="w-4 h-4" />
                     )}
-                    Payer les sélectionnés
+                    Pay selected
                   </button>
                 </>
               )}
@@ -478,10 +479,10 @@ export default function AdminPage() {
                         />
                       </th>
                       <th className="p-4 text-left text-sm font-medium text-gray-300">User TikTok</th>
-                      <th className="p-4 text-left text-sm font-medium text-gray-300">Vidéo</th>
+                      <th className="p-4 text-left text-sm font-medium text-gray-300">Video</th>
                       <th className="p-4 text-left text-sm font-medium text-gray-300">Stats</th>
                       <th className="p-4 text-left text-sm font-medium text-gray-300">Wallet</th>
-                      <th className="p-4 text-left text-sm font-medium text-gray-300">Statut</th>
+                      <th className="p-4 text-left text-sm font-medium text-gray-300">Status</th>
                       <th className="p-4 text-left text-sm font-medium text-gray-300">Date</th>
                     </tr>
                   </thead>
@@ -506,7 +507,7 @@ export default function AdminPage() {
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-tiktok-cyan hover:underline"
                           >
-                            Voir <ExternalLink className="w-3 h-3" />
+                            View <ExternalLink className="w-3 h-3" />
                           </a>
                         </td>
                         <td className="p-4">
@@ -553,7 +554,7 @@ export default function AdminPage() {
                     {submissions.length === 0 && (
                       <tr>
                         <td colSpan={7} className="p-8 text-center text-gray-400">
-                          Aucune soumission
+                          No submissions
                         </td>
                       </tr>
                     )}
@@ -582,7 +583,7 @@ export default function AdminPage() {
               }}
               className="bg-starknet-purple hover:bg-starknet-purple/80 px-4 py-2 rounded-lg mb-6 transition-colors"
             >
-              + Nouvelle campagne
+              + New campaign
             </button>
 
             {/* Campaign Form Modal */}
@@ -590,11 +591,11 @@ export default function AdminPage() {
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                 <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
                   <h2 className="text-xl font-bold mb-4">
-                    {editingCampaign ? 'Modifier la campagne' : 'Nouvelle campagne'}
+                    {editingCampaign ? 'Edit campaign' : 'New campaign'}
                   </h2>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">Nom</label>
+                      <label className="block text-sm font-medium mb-1">Name</label>
                       <input
                         type="text"
                         value={campaignForm.name}
@@ -605,7 +606,7 @@ export default function AdminPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1">Vues min.</label>
+                        <label className="block text-sm font-medium mb-1">Min. Views</label>
                         <input
                           type="number"
                           value={campaignForm.min_views}
@@ -614,7 +615,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">Likes min.</label>
+                        <label className="block text-sm font-medium mb-1">Min. Likes</label>
                         <input
                           type="number"
                           value={campaignForm.min_likes}
@@ -623,7 +624,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">Récompense (STRK)</label>
+                        <label className="block text-sm font-medium mb-1">Reward (STRK)</label>
                         <input
                           type="text"
                           value={campaignForm.reward_amount}
@@ -632,7 +633,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">Max gagnants</label>
+                        <label className="block text-sm font-medium mb-1">Max winners</label>
                         <input
                           type="number"
                           value={campaignForm.max_winners}
@@ -652,14 +653,14 @@ export default function AdminPage() {
                               : 'bg-green-600 hover:bg-green-500'
                           }`}
                         >
-                          {editingCampaign.is_active ? 'Suspendre' : 'Activer'}
+                          {editingCampaign.is_active ? 'Suspend' : 'Activate'}
                         </button>
                         <button
                           onClick={() => handleDeleteCampaign(editingCampaign)}
                           disabled={loading}
                           className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded-lg transition-colors"
                         >
-                          Supprimer
+                          Delete
                         </button>
                       </div>
                     )}
@@ -668,14 +669,14 @@ export default function AdminPage() {
                         onClick={() => setShowCampaignForm(false)}
                         className="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded-lg transition-colors"
                       >
-                        Annuler
+                        Cancel
                       </button>
                       <button
                         onClick={handleSaveCampaign}
                         disabled={loading || !campaignForm.name}
                         className="flex-1 bg-starknet-purple hover:bg-starknet-purple/80 py-2 rounded-lg transition-colors disabled:opacity-50"
                       >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Enregistrer'}
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Save'}
                       </button>
                     </div>
                   </div>
@@ -710,19 +711,19 @@ export default function AdminPage() {
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <div className="text-gray-400">Vues min.</div>
+                      <div className="text-gray-400">Min. Views</div>
                       <div className="font-bold">{formatNumber(campaign.min_views)}</div>
                     </div>
                     <div>
-                      <div className="text-gray-400">Likes min.</div>
+                      <div className="text-gray-400">Min. Likes</div>
                       <div className="font-bold">{formatNumber(campaign.min_likes)}</div>
                     </div>
                     <div>
-                      <div className="text-gray-400">Récompense</div>
+                      <div className="text-gray-400">Reward</div>
                       <div className="font-bold">{campaign.reward_amount} STRK</div>
                     </div>
                     <div>
-                      <div className="text-gray-400">Max gagnants</div>
+                      <div className="text-gray-400">Max winners</div>
                       <div className="font-bold">{campaign.max_winners}</div>
                     </div>
                   </div>

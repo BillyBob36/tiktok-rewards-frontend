@@ -29,7 +29,7 @@ export default function AuthCallbackPage() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-tiktok-cyan" />
-        <p className="text-white/70">Connexion en cours...</p>
+        <p className="text-white/70">Connecting...</p>
       </div>
     </div>
   );
