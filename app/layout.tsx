@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'TikTok Rewards - Earn STRK',
   description: 'Submit your TikTok videos and earn Starknet rewards',
+  icons: {
+    icon: '/logo-starktok.png',
+  },
 }
 
 export default function RootLayout({
