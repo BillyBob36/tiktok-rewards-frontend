@@ -239,7 +239,7 @@ export default function HomePage() {
           {!user ? (
             // Login Section
             <div className="text-center py-8">
-              <Image src="/logo-starktok.png" alt="StarkTok" width={64} height={64} className="mx-auto mb-4" />
+              <Image src="/tiktok-logo.png" alt="TikTok" width={64} height={64} className="mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-2">Connect with TikTok</h2>
               <p className="text-white/60 mb-6">
                 To participate, connect your TikTok account
@@ -252,7 +252,7 @@ export default function HomePage() {
                 {authLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <Image src="/logo-starktok.png" alt="StarkTok" width={20} height={20} />
+                  <Image src="/tiktok-logo.png" alt="TikTok" width={20} height={20} />
                 )}
                 Login with TikTok
               </button>
