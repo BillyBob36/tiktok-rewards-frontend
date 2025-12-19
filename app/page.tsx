@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Gift, CheckCircle, XCircle, Loader2, ExternalLink, LogOut, Search, Eye, Heart, MessageCircle, Share2, ChevronDown, X } from 'lucide-react';
+import { Gift, CheckCircle, XCircle, Loader2, ExternalLink, LogOut, Search, Eye, Heart, MessageCircle, Share2, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
-import { getTikTokAuthUrl, tiktokCallback, getSession, getAllActiveCampaigns, submitVideo, logout, getUserVideos } from '@/lib/api';
+import { getTikTokAuthUrl, tiktokCallback, getSession, getActiveCampaign, submitVideo, logout, getUserVideos } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
 
 interface Campaign {
@@ -46,9 +46,7 @@ interface SubmissionResult {
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-  const [showCampaignsModal, setShowCampaignsModal] = useState(false);
+  const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [videoSearch, setVideoSearch] = useState('');
@@ -66,7 +64,7 @@ export default function HomePage() {
     if (savedSessionId) {
       loadSession(savedSessionId);
     }
-    loadCampaigns();
+    loadCampaign();
 
     // Handle OAuth callback
     const urlParams = new URLSearchParams(window.location.search);
@@ -86,15 +84,12 @@ export default function HomePage() {
     }
   };
 
-  const loadCampaigns = async () => {
+  const loadCampaign = async () => {
     try {
-      const response = await getAllActiveCampaigns();
-      setCampaigns(response.data);
-      if (response.data.length > 0) {
-        setSelectedCampaign(response.data[0]);
-      }
+      const response = await getActiveCampaign();
+      setCampaign(response.data);
     } catch (err) {
-      console.error('Failed to load campaigns');
+      console.error('Failed to load campaign');
     }
   };
 
@@ -172,7 +167,7 @@ export default function HomePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!sessionId || !selectedVideo || !walletAddress || !selectedCampaign) return;
+    if (!sessionId || !selectedVideo || !walletAddress || !campaign) return;
 
     setLoading(true);
     setError(null);
@@ -183,7 +178,7 @@ export default function HomePage() {
         sessionId,
         videoUrl: selectedVideo.shareUrl,
         walletAddress,
-        campaignId: selectedCampaign.id
+        campaignId: campaign.id
       });
       setResult(response.data);
       if (response.data.eligible) {
@@ -212,99 +207,28 @@ export default function HomePage() {
           </p>
         </header>
 
-        {/* Campaigns Button */}
-        {campaigns.length > 0 && (
-          <div className="mb-8">
-            <button
-              onClick={() => setShowCampaignsModal(true)}
-              className="btn-primary w-full flex items-center justify-center gap-2 py-4"
-            >
-              <Gift className="w-5 h-5" />
-              Campagnes en cours ({campaigns.length})
-            </button>
-          </div>
-        )}
-
-        {/* Campaigns Modal */}
-        {showCampaignsModal && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <h2 className="text-xl font-bold">Campagnes en cours</h2>
-                <button
-                  onClick={() => setShowCampaignsModal(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-4 overflow-y-auto max-h-[60vh] space-y-4">
-                {campaigns.map((camp) => (
-                  <div
-                    key={camp.id}
-                    onClick={() => {
-                      setSelectedCampaign(camp);
-                      setShowCampaignsModal(false);
-                    }}
-                    className={`card cursor-pointer transition-all hover:scale-[1.02] ${
-                      selectedCampaign?.id === camp.id ? 'ring-2 ring-starknet-purple' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-4">
-                      <Gift className="w-5 h-5 text-tiktok-cyan" />
-                      <h3 className="text-lg font-semibold">{camp.name}</h3>
-                      {selectedCampaign?.id === camp.id && (
-                        <span className="ml-auto text-xs bg-starknet-purple px-2 py-1 rounded-full">Sélectionnée</span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                      <div className="bg-white/5 rounded-xl p-2">
-                        <div className="text-lg font-bold text-tiktok-cyan">{formatNumber(camp.min_views)}</div>
-                        <div className="text-xs text-white/60">Min. Views</div>
-                      </div>
-                      <div className="bg-white/5 rounded-xl p-2">
-                        <div className="text-lg font-bold text-tiktok-red">{formatNumber(camp.min_likes)}</div>
-                        <div className="text-xs text-white/60">Min. Likes</div>
-                      </div>
-                      <div className="bg-white/5 rounded-xl p-2">
-                        <div className="text-lg font-bold text-starknet-purple">{camp.reward_amount}</div>
-                        <div className="text-xs text-white/60">STRK to Win</div>
-                      </div>
-                      <div className="bg-white/5 rounded-xl p-2">
-                        <div className="text-lg font-bold text-white">{camp.max_winners}</div>
-                        <div className="text-xs text-white/60">Max Winners</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Selected Campaign Info */}
-        {selectedCampaign && (
+        {/* Campaign Info */}
+        {campaign && (
           <div className="card mb-8">
             <div className="flex items-center gap-2 mb-4">
               <Gift className="w-5 h-5 text-tiktok-cyan" />
-              <h2 className="text-xl font-semibold">{selectedCampaign.name}</h2>
-              <span className="ml-auto text-xs bg-starknet-purple/20 text-starknet-purple px-2 py-1 rounded-full">Campagne sélectionnée</span>
+              <h2 className="text-xl font-semibold">{campaign.name}</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-2xl font-bold text-tiktok-cyan">{formatNumber(selectedCampaign.min_views)}</div>
+                <div className="text-2xl font-bold text-tiktok-cyan">{formatNumber(campaign.min_views)}</div>
                 <div className="text-sm text-white/60">Min. Views</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-2xl font-bold text-tiktok-red">{formatNumber(selectedCampaign.min_likes)}</div>
+                <div className="text-2xl font-bold text-tiktok-red">{formatNumber(campaign.min_likes)}</div>
                 <div className="text-sm text-white/60">Min. Likes</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-2xl font-bold text-starknet-purple">{selectedCampaign.reward_amount}</div>
+                <div className="text-2xl font-bold text-starknet-purple">{campaign.reward_amount}</div>
                 <div className="text-sm text-white/60">STRK to Win</div>
               </div>
               <div className="bg-white/5 rounded-xl p-3">
-                <div className="text-2xl font-bold text-white">{selectedCampaign.max_winners}</div>
+                <div className="text-2xl font-bold text-white">{campaign.max_winners}</div>
                 <div className="text-sm text-white/60">Max Winners</div>
               </div>
             </div>
